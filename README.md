@@ -2,7 +2,8 @@
 ### REQUIRES iCal REPO AS WELL
 clone iCal then in the same directory, clone this.
 rough file structure:
-```/path/to/repos/iCal
+``` bash
+/path/to/repos/iCal
 /path/to/repos/DeadlineARCADE
 ```
 This is achieved by cloning iCal first due to the symlink dependencies.
