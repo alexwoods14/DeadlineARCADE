@@ -1,9 +1,9 @@
 # DeadlineARCADE
-### REQUIRES iCal REPO AS WELL
+### REQUIRES iCalFeed REPO AS WELL
 clone iCal then in the same directory, clone this.
 rough file structure:
 ``` bash
-/path/to/repos/iCal
+/path/to/repos/iCalFeed
 /path/to/repos/DeadlineARCADE
 ```
 This is achieved by cloning iCal first due to the symlink dependencies.
