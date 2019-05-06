@@ -11,11 +11,11 @@ class iCal:
         endOfInfo = self.plainlist.index('BEGIN:VEVENT')
         self.fileInfo = self.plainlist[:endOfInfo]
         self.splitData(endOfInfo)
-        print("length = ",len(self.events))
         #self.sortByWeeks()
+        self.splitByCourse()
 
 
-    def getList(self):
+    def getInfo(self):
         return '\n'.join(self.fileInfo)
     
     def splitData(self, start):
@@ -30,6 +30,37 @@ class iCal:
 
     def onDay(self, date): # date as DateString
         return [event.all(e) for e in self.events if event.onDay(e, date.date())]
+
+    def splitByCourse(self):
+        courses = {}
+        for e in self.events:
+            course = event.all(e)["SUMMARY"].strip("Deadline: ").split(" ", 1)[0].replace("s1","").replace("s2","")
+            if course in courses:
+                courses[course].append(event.all(e))
+            else:
+                courses[course] = [event.all(e)]
+
+        for course,val in courses.items():
+            courses[course] = sorted(val, key=lambda x: x["DTSTART"], reverse=False)
+        
+        
+        self.byCourse = courses
+       
+
+    def next(self, course, date):
+        if course not in self.byCourse:
+            return None
+        else:
+            requested = self.byCourse[course]
+            for e in requested:
+                if e["DTSTART"] > date:
+                    return e["DTSTART"]
+            return "No more deadlines"
+            
+            
+
+
+
 
 
 def splitAtEvent(toSplit):
