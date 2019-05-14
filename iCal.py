@@ -29,21 +29,20 @@ class iCal:
         return event.allInfo(self.events[index])
 
     def onDay(self, date): # date as DateString
-        return [event.all(e) for e in self.events if event.onDay(e, date.date())]
+        return [e.all() for e in self.events if e.onDay(date.date())]
 
     def splitByCourse(self):
         courses = {}
         for e in self.events:
-            course = event.all(e)["SUMMARY"].strip("Deadline: ").split(" ", 1)[0].replace("s1","").replace("s2","")
+            course = e.all()["SUMMARY"].strip("Deadline: ").split(" ", 1)[0].replace("s1","").replace("s2","").strip()
             if course in courses:
-                courses[course].append(event.all(e))
+                courses[course].append(e.all())
             else:
-                courses[course] = [event.all(e)]
+                courses[course] = [e.all()]
 
         for course,val in courses.items():
             courses[course] = sorted(val, key=lambda x: x["DTSTART"], reverse=False)
-        
-        
+
         self.byCourse = courses
        
 
@@ -54,8 +53,8 @@ class iCal:
             requested = self.byCourse[course]
             for e in requested:
                 if e["DTSTART"] > date:
-                    return e["DTSTART"]
-            return "No more deadlines"
+                    return e
+            return "PAST COURSE"
             
             
 
