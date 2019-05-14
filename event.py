@@ -10,28 +10,37 @@ class event:
 
         for key in keys:
             if key in data:
+                # find start of the string relating to the data
                 start = data.index(key) + len(key) + 1 # +1 is for starting colon :
+                # check if any of the keys occur again
                 matches = re.search(r"(?=("+'|'.join(keys)+r"))", data[start:])
                 if matches is not None:
+                    # if they do, the start of the next key is the end of the current
                     end = start + matches.start()
                     value = data[start:end].replace('\n ' ,'').strip(' \n')
                 else:
+                    # if there is no more keys, rest of string is value
                     value = data[start:].replace('\n ','').strip(' \n')
 
                 if value is '':
+                    # if empty. make it None. Easier to check later
                     value = None
                 
                 if "DT" in key and value is not None:
-                    # DT is date stamp to be made into a datetime object
+                    # DT is date stamp to be made into a datetime object for
+                    # easier use
                     value = datetime.strptime(value.strip('Z'),"%Y%m%dT%H%M%S") 
 
+                # update the dictionary accordingly
                 self.info[key] = value
 
         
         if self.info["EXDATE"] is not None:
+            # turn Exception dates into a list of datetimes using list comprehension
             self.info["EXDATE"] = [datetime.strptime(date,"%Y%m%dT%H%M%S") for date in self.info["EXDATE"].split(',')] 
 
         if self.info["RRULE"] is not None:
+            # Make a dictionary for the rule. Currently only frequency and until.
             rule = self.info["RRULE"]
             if "FREQ" in rule:
                 start = rule.index("FREQ") + 5
@@ -52,6 +61,7 @@ class event:
         return self.info
 
     def __str__(self):
+        # simple info when object is printed
         return "{}\n{}\n{} to {}".format(self.info["SUMMARY"], 
                 self.info["DESCRIPTION"], self.info["DTSTART"].time(),
                 self.info["DTEND"].time()) 
