@@ -22,6 +22,7 @@ class event:
                     value = None
                 
                 if "DT" in key and value is not None:
+                    # DT is date stamp to be made into a datetime object
                     value = datetime.strptime(value.strip('Z'),"%Y%m%dT%H%M%S") 
 
                 self.info[key] = value
@@ -51,7 +52,9 @@ class event:
         return self.info
 
     def __str__(self):
-        return "{}\n{}\n{} to {}".format(self.info["SUMMARY"], self.info["DESCRIPTION"], self.info["DTSTART"].time(), self.info["DTEND"].time()) 
+        return "{}\n{}\n{} to {}".format(self.info["SUMMARY"], 
+                self.info["DESCRIPTION"], self.info["DTSTART"].time(),
+                self.info["DTEND"].time()) 
 
     def __repr__(self):
         return str(self)
@@ -60,22 +63,31 @@ class event:
         return self.info
 
     def onDay(self, date): # date is a datetime
+        # it is today
         if date == self.info["DTSTART"].date():
             return True
+        # a day before today
         if date < self.info["DTSTART"].date():
             return False
         if self.info["EXDATE"] is not None:
+        # if not before this date, check if today is an exception date
             if date in [d.date() for d in self.info["EXDATE"]]:
                 return False
+
         if self.info["RRULE"] is not None:
+            # repeating event
             if "FREQ" in self.info["RRULE"]:
                 freq = self.info["RRULE"]["FREQ"]
+                # until a certain date
                 if "UNTIL" in self.info["RRULE"]:
                     until = self.info["RRULE"]["UNTIL"].date()
+                    # if today is after the final date, not on today
                     if date > until:
                         return False
-                    current = self.info["DTSTART"].date() + timedelta(weeks = 1)
+                    # if its weekly. add a week and check if it today or past
+                    # today and exit accordingly
                     if freq == "WEEKLY":
+                        current = self.info["DTSTART"].date() + timedelta(weeks = 1)
                         while current <= until:
                             if current == date:
                                 return True
